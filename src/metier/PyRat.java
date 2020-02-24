@@ -4,8 +4,33 @@ import java.util.*;
 
 public class PyRat {
 
+    private List<Point> lstFromages;
+    private Map<Point, Integer> mapFromages;
+    private Map<Point, List<Point>> laby;
+    private Map<Point, Boolean[][]> labyrinthe;
+
     /* Méthode appelée une seule fois permettant d'effectuer des traitements "lourds" afin d'augmenter la performace de la méthode turn. */
     public void preprocessing(Map<Point, List<Point>> laby, int labyWidth, int labyHeight, Point position, List<Point> fromages) {
+        lstFromages = fromages;
+
+        mapFromages = new HashMap<>();
+        int i = 0;
+        for (Point p : fromages) {
+            mapFromages.put(p, i);
+            i++;
+        }
+
+        this.laby =  laby;
+
+        this.labyrinthe = new HashMap<>();
+        for (Point pKey: laby.keySet()) {
+            Boolean[][] boolAccessiblePoints = new Boolean[labyWidth][labyHeight];
+            for (Point p : laby.get(pKey)) {
+                boolAccessiblePoints[p.getX()][p.getY()] = true;
+            }
+            this.labyrinthe.put(pKey, boolAccessiblePoints);
+        }
+
     }
 
     /* Méthode de test appelant les différentes fonctionnalités à développer.
@@ -26,26 +51,30 @@ public class PyRat {
     /* Regarde dans la liste des fromages s’il y a un fromage à la position pos.
         @return true s'il y a un fromage à la position pos, false sinon. */
     private boolean fromageIci(Point pos) {
-        return false;
+        return lstFromages.contains(pos);
     }
 
     /* Regarde de manière performante (accès en ordre constant) s’il y a un fromage à la position pos.
         @return true s'il y a un fromage à la position pos, false sinon. */
     private boolean fromageIci_EnOrdreConstant(Point pos) {
-        return false;
+        if (mapFromages.get(pos) != null)
+            return true;
+        else
+            return false;
     }
 
     /* Indique si le joueur peut passer de la position (du Point) « de » au point « a ».
         @return true s'il y a un passage depuis  « de » vers « a ». */
     private boolean passagePossible(Point de, Point a) {
-        return false;
+        return laby.get(de).contains(a);
     }
 
     /* Indique si le joueur peut passer de la position (du Point) « de » au point « a »,
         mais sans devoir parcourir la liste des Points se trouvant dans la Map !
         @return true s'il y a un passage depuis  « de » vers « a ». */
     private boolean passagePossible_EnOrdreConstant(Point de, Point a) {
-        return false;
+        Boolean[][] accessiblePoints = this.labyrinthe.get(de);
+        return accessiblePoints[a.getX()][a.getY()];
     }
 
     /* Retourne la liste des points qui ne peuvent pas être atteints depuis la position « pos ».
